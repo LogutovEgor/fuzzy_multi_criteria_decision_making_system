@@ -1,0 +1,2 @@
+rootProject.name = "Fuzzy multi criteria decision making system"
+include ':app'
