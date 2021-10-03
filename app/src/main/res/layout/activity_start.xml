@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StartActivity">
+
+    <TextView
+        android:id="@+id/textViewAlpha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/alpha"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberCriterias"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNumberLinguisticTerms" />
+
+    <TextView
+        android:id="@+id/textViewNumberAlternatives"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/number_alternatives"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewNumberCriterias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/number_criterias"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberAlternatives"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNumberAlternatives" />
+
+    <TextView
+        android:id="@+id/textViewNumberLinguisticTerms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/number_linguistic_terms"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberCriterias"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNumberCriterias" />
+
+    <EditText
+        android:id="@+id/editTextNumberAlternatives"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="2"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberAlternatives"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNumberAlternatives" />
+
+    <EditText
+        android:id="@+id/editTextNumberCriterias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="2"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberCriterias"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNumberCriterias" />
+
+    <EditText
+        android:id="@+id/editTextNumberLinguisticTerms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="5"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewNumberLinguisticTerms"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNumberLinguisticTerms" />
+
+    <EditText
+        android:id="@+id/editTextAlpha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:text="0.5"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/textViewAlpha"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAlpha" />
+
+    <Button
+        android:id="@+id/buttonOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:onClick="onButtonOkClick"
+        android:text="Ok"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

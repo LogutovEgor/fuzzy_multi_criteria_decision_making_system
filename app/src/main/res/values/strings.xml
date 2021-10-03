@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Fuzzy multi criteria decision making system</string>
+    <string name="number_alternatives">Number alternatives:</string>
+    <string name="number_criterias">Number criterias:</string>
+    <string name="number_linguistic_terms">Number linguistic terms:</string>
+    <string name="alpha">Alpha:</string>
+    <string name="name">Name:</string>
+    <string name="short_name">Short name:</string>
+    <string name="left">Left</string>
+    <string name="middle">Middle</string>
+    <string name="right">Right</string>
 </resources>
