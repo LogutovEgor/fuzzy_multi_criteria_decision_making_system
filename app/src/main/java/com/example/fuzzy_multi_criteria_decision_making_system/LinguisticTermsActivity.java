@@ -2,6 +2,7 @@ package com.example.fuzzy_multi_criteria_decision_making_system;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -253,11 +254,14 @@ public class LinguisticTermsActivity extends AppCompatActivity {
     }
 
     public void onNormalizeButtonClick(View view) {
-
+        Data.getInstance().normalizeLinguisticTerms();
+        updateInfo();
+        updateChart();
     }
 
     public void onFinishButtonClick(View view) {
-
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private boolean validateName(String value) throws Exception {

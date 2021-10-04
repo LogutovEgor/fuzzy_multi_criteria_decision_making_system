@@ -54,7 +54,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="number"
-        android:text="2"
+        android:text="4"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@+id/textViewNumberAlternatives"
         app:layout_constraintTop_toBottomOf="@+id/textViewNumberAlternatives" />
@@ -66,7 +66,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="number"
-        android:text="2"
+        android:text="4"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@+id/textViewNumberCriterias"
         app:layout_constraintTop_toBottomOf="@+id/textViewNumberCriterias" />

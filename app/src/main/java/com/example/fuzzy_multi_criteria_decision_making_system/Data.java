@@ -73,6 +73,39 @@ public final class Data {
         linguisticTerms.add(index, linguisticTerm);
     }
 
+    public void normalizeLinguisticTerms() {
+        float minValue = Float.MAX_VALUE;
+        for (LinguisticTerm linguisticTerm: linguisticTerms) {
+            if (linguisticTerm.getLeft() <= minValue)
+                minValue = linguisticTerm.getLeft();
+            if (linguisticTerm.getMiddle() <= minValue)
+                minValue = linguisticTerm.getMiddle();
+            if (linguisticTerm.getRight() <= minValue)
+                minValue = linguisticTerm.getRight();
+        }
+
+        float maxValue = minValue;
+        for (LinguisticTerm linguisticTerm: linguisticTerms) {
+            if (linguisticTerm.getLeft() >= maxValue)
+                maxValue = linguisticTerm.getLeft();
+            if (linguisticTerm.getMiddle() >= maxValue)
+                maxValue = linguisticTerm.getMiddle();
+            if (linguisticTerm.getRight() >= maxValue)
+                maxValue = linguisticTerm.getRight();
+        }
+
+        for (LinguisticTerm linguisticTerm: linguisticTerms) {
+            float leftValue = (linguisticTerm.getLeft() - minValue)/(maxValue - minValue);
+            float middleValue = (linguisticTerm.getMiddle() - minValue)/(maxValue - minValue);
+            float rightValue = (linguisticTerm.getRight() - minValue)/(maxValue - minValue);
+
+            linguisticTerm.setLeft(leftValue);
+            linguisticTerm.setMiddle(middleValue);
+            linguisticTerm.setRight(rightValue);
+        }
+    }
+
+
     private Data() {
         linguisticTerms = new ArrayList<>();
     }
