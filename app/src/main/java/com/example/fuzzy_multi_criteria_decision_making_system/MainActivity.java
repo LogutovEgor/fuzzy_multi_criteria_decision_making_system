@@ -23,12 +23,16 @@ public class MainActivity extends AppCompatActivity {
 
     TableLayout tableLayout;
 
+    ArrayList<SpinnerLinguisticData> spinnerLinguisticData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         tableLayout = findViewById(R.id.table_layout);
+
+        spinnerLinguisticData = Data.getInstance().getSpinnerLinguisticData();
         createTable();
     }
 
@@ -68,11 +72,10 @@ public class MainActivity extends AppCompatActivity {
                         textView.setText("A" + i);
                     } else {
                         Spinner spinner = new Spinner(this);
-                        spinner.setGravity(Gravity.CENTER);
-                        String[] spinnerData = { "1", "2", "3" };
+                        //spinner.setGravity(Gravity.START);
                         // Create an ArrayAdapter using the string array and a default spinner layout
-                        ArrayAdapter<CharSequence> adapter = new ArrayAdapter(this,
-                                android.R.layout.simple_spinner_dropdown_item, spinnerData);
+                        ArrayAdapter<SpinnerLinguisticData> adapter = new ArrayAdapter(this,
+                                android.R.layout.simple_spinner_dropdown_item, spinnerLinguisticData);
 // Specify the layout to use when the list of choices appears
 //                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner

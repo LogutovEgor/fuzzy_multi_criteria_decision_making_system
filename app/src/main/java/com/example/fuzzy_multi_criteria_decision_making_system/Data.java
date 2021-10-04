@@ -105,6 +105,29 @@ public final class Data {
         }
     }
 
+    public ArrayList<SpinnerLinguisticData> getSpinnerLinguisticData() {
+        ArrayList<SpinnerLinguisticData> result = new ArrayList<>();
+
+        //simple less over
+        for (int i = 0; i < Data.getInstance().getNumberLinguisticTerms(); i++) {
+            LinguisticTerm linguisticTerm = Data.getInstance().getLinguisticTerm(i);
+            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Simple, linguisticTerm));
+            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Less, linguisticTerm));
+            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Over, linguisticTerm));
+        }
+
+        //within
+        for (int i = 0; i < Data.getInstance().getNumberLinguisticTerms(); i++) {
+            LinguisticTerm firstLinguisticTerm = Data.getInstance().getLinguisticTerm(i);
+
+            for (int j = i + 1; j < Data.getInstance().getNumberLinguisticTerms(); j++) {
+                LinguisticTerm secondLinguisticTerm = Data.getInstance().getLinguisticTerm(j);
+                result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Within, firstLinguisticTerm, secondLinguisticTerm));
+            }
+        }
+
+        return result;
+    }
 
     private Data() {
         linguisticTerms = new ArrayList<>();
