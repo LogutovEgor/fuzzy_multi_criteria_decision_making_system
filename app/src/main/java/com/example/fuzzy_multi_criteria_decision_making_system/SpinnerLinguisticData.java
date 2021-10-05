@@ -1,6 +1,11 @@
 package com.example.fuzzy_multi_criteria_decision_making_system;
 
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpinnerLinguisticData {
     public enum Type { Simple, Less, Over, Within }
@@ -8,18 +13,23 @@ public class SpinnerLinguisticData {
     private Type type;
     public Type getType() { return type; }
 
-    private LinguisticTerm firstLinguisticTerm;
-    private LinguisticTerm secondLinguisticTerm;
+    private boolean transformedToIntervals;
 
-    public SpinnerLinguisticData(Type type, LinguisticTerm firstLinguisticTerm) {
+    private List<Pair<Integer, LinguisticTerm>> linguisticTerms;
+
+    public SpinnerLinguisticData(Type type, Integer index, LinguisticTerm linguisticTerm) {
         this.type = type;
-        this.firstLinguisticTerm = firstLinguisticTerm;
+        transformedToIntervals = false;
+        linguisticTerms = new ArrayList<>();
+        linguisticTerms.add(new Pair<>(index, linguisticTerm));
     }
 
-    public SpinnerLinguisticData(Type type, LinguisticTerm firstLinguisticTerm, LinguisticTerm secondLinguisticTerm){
+    public SpinnerLinguisticData(Type type, Integer firstIndex, LinguisticTerm firstLinguisticTerm, Integer secondIndex, LinguisticTerm secondLinguisticTerm){
         this.type = type;
-        this.firstLinguisticTerm = firstLinguisticTerm;
-        this.secondLinguisticTerm = secondLinguisticTerm;
+        linguisticTerms = new ArrayList<>();
+        transformedToIntervals = false;
+        linguisticTerms.add(new Pair<>(firstIndex, firstLinguisticTerm));
+        linguisticTerms.add(new Pair<>(secondIndex, secondLinguisticTerm));
     }
 
     @NonNull
@@ -27,13 +37,13 @@ public class SpinnerLinguisticData {
     public String toString() {
         switch (type) {
             case Simple:
-                return firstLinguisticTerm.getShortName();
+                return linguisticTerms.get(0).second.getShortName();
             case Less:
-                return "less " + firstLinguisticTerm.getShortName();
+                return "less " + linguisticTerms.get(0).second.getShortName();
             case Over:
-                return "over " + firstLinguisticTerm.getShortName();
+                return "over " + linguisticTerms.get(0).second.getShortName();
             case Within:
-                return "within " + firstLinguisticTerm.getShortName() + " and " + secondLinguisticTerm.getShortName();
+                return "within " + linguisticTerms.get(0).second.getShortName() + " and " + linguisticTerms.get(1).second.getShortName();
             default:
                 return "invalid";
         }
