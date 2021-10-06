@@ -260,6 +260,7 @@ public class LinguisticTermsActivity extends AppCompatActivity {
     }
 
     public void onFinishButtonClick(View view) {
+        onNormalizeButtonClick(view);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

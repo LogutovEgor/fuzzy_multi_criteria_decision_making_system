@@ -4,26 +4,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Pie;
-
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     TableLayout tableLayout;
 
-    ArrayList<SpinnerLinguisticData> spinnerLinguisticData;
+    Spinner spinnerMethod;
+
+    ArrayList<SpinnerData> spinnerLinguisticData;
+    ArrayAdapter<SpinnerData> adapter;
+    
+
+    Spinner[][] spinners;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
         tableLayout = findViewById(R.id.table_layout);
 
+        spinnerMethod = findViewById(R.id.spinnerMethod);
+        ArrayAdapter<String> adapter = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_dropdown_item, Data.getInstance().getCalculateMethods());
+        spinnerMethod.setAdapter(adapter);
+
         spinnerLinguisticData = Data.getInstance().getSpinnerLinguisticData();
         createTable();
     }
@@ -39,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private void createTable() {
         int numberAlternatives = Data.getInstance().getNumberAlternatives();
         int numberCriterias = Data.getInstance().getNumberCriterias();
-
+        spinners = new Spinner[numberAlternatives][numberCriterias];
+        adapter = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_dropdown_item, spinnerLinguisticData);
         for (int i = 0; i <= numberAlternatives; i++) {
             TableRow topTableRow = new TableRow(this);
             tableLayout.addView(topTableRow);
@@ -71,16 +78,9 @@ public class MainActivity extends AppCompatActivity {
                         topTableRow.addView(textView);
                         textView.setText("A" + i);
                     } else {
-                        Spinner spinner = new Spinner(this);
-                        //spinner.setGravity(Gravity.START);
-                        // Create an ArrayAdapter using the string array and a default spinner layout
-                        ArrayAdapter<SpinnerLinguisticData> adapter = new ArrayAdapter(this,
-                                android.R.layout.simple_spinner_dropdown_item, spinnerLinguisticData);
-// Specify the layout to use when the list of choices appears
-//                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-                        spinner.setAdapter(adapter);
-                        topTableRow.addView(spinner);
+                        spinners[i-1][j-1] = new Spinner(this);
+                        spinners[i-1][j-1].setAdapter(adapter);
+                        topTableRow.addView(spinners[i-1][j-1]);
 
                     }
                 }
@@ -89,5 +89,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    public void onButtonTransformToIntervalClick(View view) {
+        for (SpinnerData spinnerData: spinnerLinguisticData) {
+            Data.getInstance().transformToInterval(spinnerData);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    public void onButtonTransformToTrapezeClick(View view) {
+        for (SpinnerData spinnerData: spinnerLinguisticData) {
+            Data.getInstance().transformToTrapeze(spinnerData);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    public void onButtonCalculateClick(View view) {
+
     }
 }

@@ -1,6 +1,9 @@
 package com.example.fuzzy_multi_criteria_decision_making_system;
 
+import android.util.Pair;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public final class Data {
 
@@ -11,6 +14,18 @@ public final class Data {
         return instance;
     }
 
+    public final static String PESSIMISTIC = "pessimistic";
+
+    public final static String OPTIMISTIC = "optimistic";
+    public final static String GENERALIZED = "generalized";
+
+    public ArrayList<String> getCalculateMethods() {
+        ArrayList<String> result = new ArrayList<>();
+        result.add(PESSIMISTIC);
+        result.add(OPTIMISTIC);
+        result.add(GENERALIZED);
+        return result;
+    }
     private int numberAlternatives;
     public int getNumberAlternatives() { return numberAlternatives; }
     public void setNumberAlternatives(int value) { numberAlternatives = value; }
@@ -105,15 +120,15 @@ public final class Data {
         }
     }
 
-    public ArrayList<SpinnerLinguisticData> getSpinnerLinguisticData() {
-        ArrayList<SpinnerLinguisticData> result = new ArrayList<>();
+    public ArrayList<SpinnerData> getSpinnerLinguisticData() {
+        ArrayList<SpinnerData> result = new ArrayList<>();
 
         //simple less over
         for (int i = 0; i < Data.getInstance().getNumberLinguisticTerms(); i++) {
             LinguisticTerm linguisticTerm = Data.getInstance().getLinguisticTerm(i);
-            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Simple, linguisticTerm));
-            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Less, linguisticTerm));
-            result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Over, linguisticTerm));
+            result.add(new SpinnerData(SpinnerData.Type.Simple, i, linguisticTerm));
+            result.add(new SpinnerData(SpinnerData.Type.Less, i, linguisticTerm));
+            result.add(new SpinnerData(SpinnerData.Type.Over, i, linguisticTerm));
         }
 
         //within
@@ -122,11 +137,87 @@ public final class Data {
 
             for (int j = i + 1; j < Data.getInstance().getNumberLinguisticTerms(); j++) {
                 LinguisticTerm secondLinguisticTerm = Data.getInstance().getLinguisticTerm(j);
-                result.add(new SpinnerLinguisticData(SpinnerLinguisticData.Type.Within, firstLinguisticTerm, secondLinguisticTerm));
+                result.add(new SpinnerData(SpinnerData.Type.Within, i, firstLinguisticTerm, j, secondLinguisticTerm));
             }
         }
 
         return result;
+    }
+
+    public SpinnerData transformToInterval(SpinnerData spinnerData) {
+        List<Pair<Integer, LinguisticTerm>> currentLinguisticTerms = spinnerData.getLinguisticTerms();
+
+        switch (spinnerData.getType())  {
+            case Simple:
+                spinnerData.transformToInterval(currentLinguisticTerms);
+                return spinnerData;
+            case Less:
+                if (currentLinguisticTerms.get(0).first == 0)
+                {
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                } else {
+                    int linguisticTermIndex = currentLinguisticTerms.get(0).first;
+                    currentLinguisticTerms.clear();
+                    for (int i = 0; i <= linguisticTermIndex; i++) {
+                        currentLinguisticTerms.add(new Pair<>(i, linguisticTerms.get(i)));
+                    }
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                }
+            case Over:
+                if (currentLinguisticTerms.get(0).first == numberLinguisticTerms - 1)
+                {
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                } else {
+                    int linguisticTermIndex = currentLinguisticTerms.get(0).first;
+                    currentLinguisticTerms.clear();
+                    for (int i = linguisticTermIndex; i < numberLinguisticTerms; i++) {
+                        currentLinguisticTerms.add(new Pair<>(i, linguisticTerms.get(i)));
+                    }
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                }
+            case Within:
+                int firstLinguisticTermIndex = currentLinguisticTerms.get(0).first;
+                int secondLinguisticTermIndex = currentLinguisticTerms.get(1).first;
+
+                if (firstLinguisticTermIndex + 1 == secondLinguisticTermIndex)
+                {
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                } else
+                {
+                    currentLinguisticTerms.clear();
+                    for (int i = firstLinguisticTermIndex; i <= secondLinguisticTermIndex; i++) {
+                        currentLinguisticTerms.add(new Pair<>(i, linguisticTerms.get(i)));
+                    }
+                    spinnerData.transformToInterval(currentLinguisticTerms);
+                    return spinnerData;
+                }
+        }
+
+        spinnerData.transformToInterval(currentLinguisticTerms);
+        return spinnerData;
+    }
+
+    public SpinnerData transformToTrapeze(SpinnerData spinnerData) {
+        if (!spinnerData.transformedToInterval())
+            return spinnerData;
+
+        if (spinnerData.getType() == SpinnerData.Type.Simple) {
+            LinguisticTerm linguisticTerm = spinnerData.getLinguisticTerms().get(0).second;
+            float[] trapeze = { linguisticTerm.getLeft(), linguisticTerm.getMiddle(), linguisticTerm.getMiddle(), linguisticTerm.getRight() };
+            spinnerData.transformToTrapez(trapeze);
+            return spinnerData;
+        } else {
+            LinguisticTerm firstLinguisticTerm = spinnerData.getLinguisticTerms().get(0).second;
+            LinguisticTerm lastLinguisticTerm = spinnerData.getLinguisticTerms().get(spinnerData.getLinguisticTerms().size()-1).second;
+            float[] trapeze = { firstLinguisticTerm.getLeft(), firstLinguisticTerm.getMiddle(), lastLinguisticTerm.getMiddle(), lastLinguisticTerm.getRight() };
+            spinnerData.transformToTrapez(trapeze);
+            return spinnerData;
+        }
     }
 
     private Data() {
