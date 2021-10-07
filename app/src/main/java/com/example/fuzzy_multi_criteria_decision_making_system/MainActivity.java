@@ -12,6 +12,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     
 
     Spinner[][] spinners;
+    TableRow[] tableRows;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private void createTable() {
         int numberAlternatives = Data.getInstance().getNumberAlternatives();
         int numberCriterias = Data.getInstance().getNumberCriterias();
+        tableRows = new TableRow[numberAlternatives + 1];
         spinners = new Spinner[numberAlternatives][numberCriterias];
         adapter = new ArrayAdapter(this,
                 android.R.layout.simple_spinner_dropdown_item, spinnerLinguisticData);
         for (int i = 0; i <= numberAlternatives; i++) {
-            TableRow topTableRow = new TableRow(this);
-            tableLayout.addView(topTableRow);
+            tableRows[i] = new TableRow(this);
+            tableLayout.addView(tableRows[i]);
             for (int j = 0; j <= numberCriterias; j++) {
 
                 if (i == 0) {
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                     layoutParams.width = 256;
                     layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
                     textView.setLayoutParams(layoutParams);
-                    topTableRow.addView(textView);
+                    tableRows[i].addView(textView);
                     if (j != 0) {
                         textView.setText("C" + j);
                     }
@@ -75,12 +78,12 @@ public class MainActivity extends AppCompatActivity {
                         layoutParams.width = 256;
                         layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
                         textView.setLayoutParams(layoutParams);
-                        topTableRow.addView(textView);
+                        tableRows[i].addView(textView);
                         textView.setText("A" + i);
                     } else {
                         spinners[i-1][j-1] = new Spinner(this);
                         spinners[i-1][j-1].setAdapter(adapter);
-                        topTableRow.addView(spinners[i-1][j-1]);
+                        tableRows[i].addView(spinners[i-1][j-1]);
 
                     }
                 }
@@ -106,6 +109,195 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButtonCalculateClick(View view) {
+        for (SpinnerData spinnerData: spinnerLinguisticData) {
+            Data.getInstance().transformToIntervalEstimates(spinnerData);
+        }
+        adapter.notifyDataSetChanged();
 
+        String method = spinnerMethod.getSelectedItem().toString();
+        if (method.equals(Data.PESSIMISTIC)) {
+            Data.getInstance().I = new ArrayList<>();
+            Data.getInstance().p = new ArrayList<>();
+            float maxP = Float.MIN_VALUE;
+            for (int i = 0; i < spinners.length; i++)
+            {
+                float[] minI = { Float.MAX_VALUE, Float.MAX_VALUE};
+
+                for (int j = 0; j < spinners[i].length; j++) {
+                    SpinnerData spinnerData = (SpinnerData) spinners[i][j].getSelectedItem();
+                    float[] intervalEstimates = spinnerData.getIntervalEstimates();
+                    if (intervalEstimates[0] <= minI[0])
+                        minI[0] = intervalEstimates[0];
+                    if (intervalEstimates[1] <= minI[1])
+                        minI[1] = intervalEstimates[1];
+                }
+
+                float op1 = (1f - minI[0]) / (minI[1] - minI[0] + 1f);
+                if (op1 <= 0)
+                    op1 = 0;
+
+                float op2 = 1 - op1;
+                if (op2 <= 0)
+                    op2 = 0;
+
+                Data.getInstance().I.add(minI);
+                Data.getInstance().p.add(op2);
+                if (op2 >= maxP)
+                    maxP = op2;
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Minimum pessimistic");
+                } else {
+                    textView.setText(Data.getInstance().I.get(i - 1)[0] + "; " + Data.getInstance().I.get(i - 1)[1]);
+                }
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Probability pessimistic");
+                } else {
+                    textView.setText(String.valueOf(Data.getInstance().p.get(i - 1)));
+                }
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Result pessimistic");
+                } else {
+                    if (Data.getInstance().p.get(i - 1) == maxP)
+                        textView.setText(String.valueOf(Data.getInstance().p.get(i - 1)));
+                    else
+                        textView.setText("-");
+                }
+            }
+
+
+
+        }
+
+        if (method.equals(Data.OPTIMISTIC)) {
+            Data.getInstance().I = new ArrayList<>();
+            Data.getInstance().p = new ArrayList<>();
+            float maxP = Float.MIN_VALUE;
+            for (int i = 0; i < spinners.length; i++)
+            {
+                float[] maxI = { Float.MIN_VALUE, Float.MIN_VALUE};
+
+                for (int j = 0; j < spinners[i].length; j++) {
+                    SpinnerData spinnerData = (SpinnerData) spinners[i][j].getSelectedItem();
+                    float[] intervalEstimates = spinnerData.getIntervalEstimates();
+                    if (intervalEstimates[0] >= maxI[0])
+                        maxI[0] = intervalEstimates[0];
+                    if (intervalEstimates[1] >= maxI[1])
+                        maxI[1] = intervalEstimates[1];
+                }
+
+                float op1 = (1f - maxI[0]) / (maxI[1] - maxI[0] + 1f);
+                if (op1 <= 0)
+                    op1 = 0;
+
+                float op2 = 1 - op1;
+                if (op2 <= 0)
+                    op2 = 0;
+
+                Data.getInstance().I.add(maxI);
+                Data.getInstance().p.add(op2);
+                if (op2 >= maxP)
+                    maxP = op2;
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Minimum optimistic");
+                } else {
+                    textView.setText(Data.getInstance().I.get(i - 1)[0] + "; " + Data.getInstance().I.get(i - 1)[1]);
+                }
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Probability optimistic");
+                } else {
+                    textView.setText(String.valueOf(Data.getInstance().p.get(i - 1)));
+                }
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Result optimistic");
+                } else {
+                    if (Data.getInstance().p.get(i - 1) == maxP)
+                        textView.setText(String.valueOf(Data.getInstance().p.get(i - 1)));
+                    else
+                        textView.setText("-");
+                }
+            }
+        }
+
+
+
+//
+//
+//        for (int i = 1; i <= Data.getInstance().getNumberAlternatives(); i++) {
+//            TextView textView = new TextView(this);
+//            textView.setTextSize(20);
+//            textView.setGravity(Gravity.CENTER);
+//            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+//            layoutParams.width = 256;
+//            layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+//            textView.setLayoutParams(layoutParams);
+//            tableRows[i].addView(textView);
+//            textView.setText("C" + j);
+//        }
     }
 }

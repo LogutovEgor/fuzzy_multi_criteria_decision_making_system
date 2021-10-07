@@ -44,6 +44,9 @@ public final class Data {
 
     private ArrayList<LinguisticTerm> linguisticTerms;
 
+    public ArrayList<float[]> I;
+    public ArrayList<Float> p;
+
     public void createLinguisticTerms() {
         linguisticTerms = new ArrayList<>();
         float min = 0f;
@@ -218,6 +221,16 @@ public final class Data {
             spinnerData.transformToTrapez(trapeze);
             return spinnerData;
         }
+    }
+
+    public SpinnerData transformToIntervalEstimates(SpinnerData spinnerData) {
+        if (!spinnerData.transformedToTrapeze())
+            return spinnerData;
+
+        float[] trapez = spinnerData.getTrapeze();
+        float[] intervalEstimates = { alpha * (trapez[1] - trapez[0]) + trapez[0],  trapez[3] - alpha * (trapez[3] - trapez[2]) };
+        spinnerData.transformToIntervalEstimates(intervalEstimates);
+        return spinnerData;
     }
 
     private Data() {
