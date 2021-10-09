@@ -15,6 +15,7 @@ public class SpinnerData {
     public Type getType() { return type; }
 
     private TransformedState transformedState;
+    public void setTransformedState(TransformedState transformedState) { this.transformedState = transformedState; }
 
     public boolean transformedToInterval() { return transformedState == TransformedState.TransformedToInterval; }
 

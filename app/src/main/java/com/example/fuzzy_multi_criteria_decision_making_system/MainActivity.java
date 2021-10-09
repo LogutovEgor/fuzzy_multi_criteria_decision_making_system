@@ -284,20 +284,125 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        if (method.equals(Data.GENERALIZED)) {
+            for (SpinnerData spinnerData: spinnerLinguisticData) {
+                spinnerData.setTransformedState(SpinnerData.TransformedState.TransformedToTrapeze);
+            }
+            adapter.notifyDataSetChanged();
+
+            ArrayList<float[]> GS = new ArrayList<>();
+            for (int i = 0; i < spinners.length; i++)
+            {
+                float[] GSi = { Float.MAX_VALUE, Float.MAX_VALUE, Float.MIN_VALUE, Float.MIN_VALUE };
+                for (int j = 0; j < spinners[i].length; j++) {
+                    SpinnerData spinnerData = (SpinnerData) spinners[i][j].getSelectedItem();
+                    float[] trapeze = spinnerData.getTrapeze();
+                    if (trapeze[0] <= GSi[0])
+                        GSi[0] = trapeze[0];
+
+                    if (trapeze[1] <= GSi[1])
+                        GSi[1] = trapeze[1];
+
+                    if (trapeze[2] >= GSi[2])
+                        GSi[2] = trapeze[2];
+
+                    if (trapeze[3] >= GSi[3])
+                        GSi[3] = trapeze[3];
+                }
+                GS.add(GSi);
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("GS");
+                } else {
+                    float[] GSi = GS.get(i - 1);
+                    textView.setText(GSi[0] + "; " + GSi[1] + "; " + GSi[2] + "; " + GSi[3] + ";");
+                }
+            }
+
+            ArrayList<float[]> I = new ArrayList<>();
+            for (float[] GSi: GS) {
+                float[] intervalEstimates = { Data.getInstance().getAlpha() * (GSi[1] - GSi[0]) + GSi[0],  GSi[3] - Data.getInstance().getAlpha() * (GSi[3] - GSi[2]) };
+                I.add(intervalEstimates);
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Fuzzy intervals");
+                } else {
+                    textView.setText(I.get(i - 1)[0] + "; " + I.get(i - 1)[1]);
+                }
+            }
+
+            float maxP = Float.MIN_VALUE;
+            ArrayList<Float> p = new ArrayList<>();
+            for (float[] Ii: I) {
+                float op1 = (1f - Ii[0]) / (Ii[1] - Ii[0] + 1f);
+                if (op1 <= 0)
+                    op1 = 0;
+
+                float op2 = 1 - op1;
+                if (op2 <= 0)
+                    op2 = 0;
+
+                p.add(op2);
+                if (op2 >= maxP)
+                    maxP = op2;
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Probability generalized");
+                } else {
+                    textView.setText(String.valueOf(p.get(i - 1)));
+                }
+            }
+
+            for (int i = 0; i <= Data.getInstance().getNumberAlternatives(); i++) {
+                TextView textView = new TextView(this);
+                textView.setTextSize(20);
+                textView.setGravity(Gravity.CENTER);
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+                layoutParams.width = 256;
+                layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
+                textView.setLayoutParams(layoutParams);
+                tableRows[i].addView(textView);
+                if (i == 0) {
+                    textView.setText("Result generalized");
+                } else {
+                    if (p.get(i - 1) == maxP)
+                        textView.setText(String.valueOf(p.get(i - 1)));
+                    else
+                        textView.setText("-");
+                }
+            }
 
 
-//
-//
-//        for (int i = 1; i <= Data.getInstance().getNumberAlternatives(); i++) {
-//            TextView textView = new TextView(this);
-//            textView.setTextSize(20);
-//            textView.setGravity(Gravity.CENTER);
-//            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
-//            layoutParams.width = 256;
-//            layoutParams.height = TableRow.LayoutParams.WRAP_CONTENT;
-//            textView.setLayoutParams(layoutParams);
-//            tableRows[i].addView(textView);
-//            textView.setText("C" + j);
-//        }
+        }
     }
 }
